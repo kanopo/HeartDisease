@@ -23,30 +23,27 @@ import pandas as pd
     - name
 """
 
-my_fyles = os.listdir("./2 - a - train labeled")
+data = pd.read_csv("./2 - one dataset/TRAIN-dataset-heart-disease.csv")
+data.drop(inplace=True, axis='columns', labels=[
+    "id",
+    "ccf",
+    "dummy",
+    "restckm",
+    "exerckm",
+    "thalsev",
+    "thalpul",
+    "earlobe",
+    "lvx1",
+    "lvx2",
+    "lvx3",
+    "lvx4",
+    "lvf",
+    "cathef",
+    "junk",
+    "name",
+])
 
-for file in my_fyles:
-    data = pd.read_csv("./2 - a - train labeled/" + str(file))
-    data.drop(inplace=True, axis='columns', labels=[
-        "id",
-        "ccf",
-        "dummy",
-        "restckm",
-        "exerckm",
-        "thalsev",
-        "thalpul",
-        "earlobe",
-        "lvx1",
-        "lvx2",
-        "lvx3",
-        "lvx4",
-        "lvf",
-        "cathef",
-        "junk",
-        "name",
-    ])
-
-    data.to_csv("./3 - first cleanup/" + str(file), index=False)
+data.to_csv("./3 - first cleanup/train.csv", index=False)
 
 
 

@@ -1,12 +1,35 @@
+import numpy as np
 import pandas as pd
-
+import os
 from sklearn.model_selection import train_test_split
 
+"""
+Ho effettuato l'encoding di una nuova features per poter rappresentare in un unico csv il fatto che i dati provengono
+da 4 csv diversi:
+- 0 = cleveland
+- 1 = hungarian
+- 2 = long-beach-va
+- 3 = switzerland
+"""
+my_files = os.listdir("./1 - dati in csv")
 
-"""
-    LEGGO I FILE CON PANDAS
-"""
-cleveland = pd.read_csv("./1 - dati in csv/cleveland.data.csv", names=[
+encoding = 0
+
+for file_to_merge in my_files:
+    # print(file_to_merge)
+
+    data = pd.read_csv("./1 - dati in csv/" + str(file_to_merge), header=None)
+
+    encod = pd.DataFrame({"Place": [encoding]})
+    # print(encod)
+
+    # result = pd.concat([data, encod], axis=1, ignore_index=True)
+    result = pd.merge(data, encod, how="cross", right_index=False, left_index=False)
+    encoding = encoding + 1
+
+    result.to_csv("./encoded/" + str(file_to_merge), index=False, header=False)
+
+cleveland = pd.read_csv("./encoded/cleveland.data.csv", names=[
     "id",
     "ccf",
     "age",
@@ -82,10 +105,13 @@ cleveland = pd.read_csv("./1 - dati in csv/cleveland.data.csv", names=[
     "lvf",
     "cathef",
     "junk",
-    "name"
+    "name",
+    "location"
+
+
 ])
-hungarian = pd.read_csv("./1 - dati in csv/hungarian.data.csv", names=[
-    "id",
+hungarian = pd.read_csv("./encoded/hungarian.data.csv", names=[
+        "id",
     "ccf",
     "age",
     "sex",
@@ -160,10 +186,14 @@ hungarian = pd.read_csv("./1 - dati in csv/hungarian.data.csv", names=[
     "lvf",
     "cathef",
     "junk",
-    "name"
+    "name",
+    "location"
+
+
 ])
-long_beach = pd.read_csv("./1 - dati in csv/long-beach-va.data.csv", names=[
-    "id",
+
+long_beach_va = pd.read_csv("./encoded/long-beach-va.data.csv", names=[
+        "id",
     "ccf",
     "age",
     "sex",
@@ -238,10 +268,14 @@ long_beach = pd.read_csv("./1 - dati in csv/long-beach-va.data.csv", names=[
     "lvf",
     "cathef",
     "junk",
-    "name"
+    "name",
+    "location"
+
+
 ])
-switzerland = pd.read_csv("./1 - dati in csv/switzerland.data.csv", names=[
-    "id",
+
+switzerland = pd.read_csv("./encoded/switzerland.data.csv", names=[
+        "id",
     "ccf",
     "age",
     "sex",
@@ -316,69 +350,26 @@ switzerland = pd.read_csv("./1 - dati in csv/switzerland.data.csv", names=[
     "lvf",
     "cathef",
     "junk",
-    "name"
+    "name",
+    "location"
+
+
 ])
 
-"""
-    SEPARO LA LABEL TARGHET PER USARE train_test_split
-"""
-y_cleveland = cleveland.pop("num")
-X_cleveland = cleveland
+frames = [cleveland, hungarian, long_beach_va, switzerland]
 
-y_hungarian = hungarian.pop("num")
-X_hungarian = hungarian
+dataset = pd.concat(frames)
 
-y_long_beach = long_beach.pop("num")
-X_long_beach = long_beach
+dataset = dataset.replace(-9, np.nan)
 
-y_switzerland = switzerland.pop("num")
-X_switzerland = switzerland
 
-"""
-    APPLICO TRAIN TEST SPLIT
-"""
-X_train_cleveland, X_test_cleveland, y_train_cleveland, y_test_cleveland = train_test_split(
-    X_cleveland, y_cleveland, test_size=0.20
-)
 
-X_train_hungarian, X_test_hungarian, y_train_hungarian, y_test_hungarian = train_test_split(
-    X_hungarian, y_hungarian, test_size=0.20
-)
+y = dataset.pop("num")
+X = dataset
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.20)
 
-X_train_long_beach, X_test_long_beach, y_train_long_beach, y_test_long_beach = train_test_split(
-    X_long_beach, y_long_beach, test_size=0.20
-)
+train = pd.concat([X_train, y_train], axis=1)
+test = pd.concat([X_test, y_test], axis=1)
 
-X_train_switzerland, X_test_switzerland, y_train_switzerland, y_test_switzerland = train_test_split(
-    X_switzerland, y_switzerland, test_size=0.20
-)
-
-"""
-    RICOSTRUISCO I FILE DI PARTENZA MA QUESTA VOLTA DIVISI IN VALIDATION E IL RESTO(TRAIN E TEST CHE USERÒ PER I MODELLI)
-"""
-train_cleveland = pd.concat([X_train_cleveland, y_train_cleveland], axis=1)
-test_cleveland = pd.concat([X_test_cleveland, y_test_cleveland], axis=1)
-
-train_hungarian = pd.concat([X_train_hungarian, y_train_hungarian], axis=1)
-test_hungarian = pd.concat([X_test_hungarian, y_test_hungarian], axis=1)
-
-train_long_beach = pd.concat([X_train_long_beach, y_train_long_beach], axis=1)
-test_long_beach = pd.concat([X_test_long_beach, y_test_long_beach], axis=1)
-
-train_switzerland = pd.concat([X_train_switzerland, y_train_switzerland], axis=1)
-test_switzerland = pd.concat([X_test_switzerland, y_test_switzerland], axis=1)
-
-"""
-    SALVO I NUOVI FILE
-"""
-train_cleveland.to_csv("./2 - a - train labeled/train-cleveland.csv", index=False)
-test_cleveland.to_csv("./2 - b - test labeled/test-cleveland.csv", index=False)
-
-train_hungarian.to_csv("./2 - a - train labeled/train-hungarian.csv", index=False)
-test_hungarian.to_csv("./2 - b - test labeled/test-hungarian.csv", index=False)
-
-train_long_beach.to_csv("./2 - a - train labeled/train-long_beach.csv", index=False)
-test_long_beach.to_csv("./2 - b - test labeled/test-long_beach.csv", index=False)
-
-train_switzerland.to_csv("./2 - a - train labeled/train-switzerland.csv", index=False)
-test_switzerland.to_csv("./2 - b - test labeled/test-switzerland.csv", index=False)
+train.to_csv("./2 - one dataset/TRAIN-dataset-heart-disease.csv", index=False)
+test.to_csv("./2 - one dataset/TEST-dataset-heart-disease.csv", index=False)

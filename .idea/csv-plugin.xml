@@ -17,6 +17,20 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="/3 - first cleanup/train-long_beach.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/3 - first cleanup/train.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
       </map>
     </option>
   </component>
