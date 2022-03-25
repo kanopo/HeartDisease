@@ -35,7 +35,7 @@ def hard_voting(X, y, balanced):
         #("StocasticGradientDescenderClassifier", sgdc),
     ], voting="soft")
 
-    return cross_val_score(vc, X_train, y_train, cv=10, n_jobs=-1)
+    # return cross_val_score(vc, X_train, y_train, cv=10, n_jobs=-1)
 
 
 print("--------- NON BALANCED -----------")

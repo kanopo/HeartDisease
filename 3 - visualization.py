@@ -12,6 +12,7 @@ data = pd.read_csv("./3 - first cleanup/train.csv")
 
 y = data.pop("num")
 X = data
+X.pop("location")
 # NORMALIZZO
 
 X_norm = (X - X.min()) / (X.max() - X.min())

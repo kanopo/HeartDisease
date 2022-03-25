@@ -1,5 +1,3 @@
-import os
-
 
 import pandas as pd
 
@@ -22,6 +20,8 @@ import pandas as pd
     - junk
     - name
 """
+
+
 
 train = pd.read_csv("./2 - one dataset/TRAIN-dataset-heart-disease.csv")
 test = pd.read_csv("./2 - one dataset/TEST-dataset-heart-disease.csv")

@@ -1,8 +1,9 @@
 import numpy as np
 import pandas as pd
 from imblearn.over_sampling import SMOTE
+from matplotlib import pyplot as plt
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import classification_report
+from sklearn.metrics import classification_report, precision_score, recall_score, f1_score
 from sklearn.model_selection import train_test_split, KFold
 
 data = pd.read_csv("./4 - data cleaning/train.csv")
@@ -40,14 +41,73 @@ def logistic_regression(X, y, balanced):
 
         y_pred = logreg.predict(X_validation)
 
-        print(classification_report(y_validation, y_pred))
+        #print(classification_report(y_validation, y_pred))
 
-        return y_pred
+    # confronto con il test set
+    test = pd.read_csv("./4 - data cleaning/test.csv")
+
+    y_test = test.pop("target")
+    X_test = test
+
+    avg = np.mean(X_test, axis=0)
+    std = np.std(X_test, axis=0)
+    X_test = (X_test - avg) / std
+    y_test_pred = logreg.predict(X_test)
+
+    valori = [0, 0, 0]
+    if balanced:
+        # valori[0] = (accuracy_score(y_test, y_test_pred))
+        valori[0] = (precision_score(y_test, y_test_pred, average='weighted'))
+        valori[1] = (recall_score(y_test, y_test_pred, average='weighted'))
+        valori[2] = (f1_score(y_test, y_test_pred, average='weighted'))
+    else:
+        valori[0] = (precision_score(y_test, y_test_pred, average='weighted'))
+        valori[1] = (recall_score(y_test, y_test_pred, average='weighted'))
+        valori[2] = (f1_score(y_test, y_test_pred, average='weighted'))
+
+    return valori
 
 
 
 print("--------- NON BALANCED -----------")
-logistic_regression(X, y, False)
+valori = logistic_regression(X, y, False)
+print("------------------- test ----------------")
+print("precision:")
+print(valori[0])
+print("recall:")
+print(valori[1])
+print("f1:")
+print(valori[2])
+
+color_palette = [
+        '#226F54',
+        '#5BC3EB',
+        '#FCCA46',
+
+    ]
+
+
+people = ("precision", "recall", "f1")
+y_pos = np.arange(len(people))
+valori[0] = valori[0] * 100
+valori[1] = valori[1] * 100
+valori[2] = valori[2] * 100
+performance = valori
+
+fig, ax = plt.subplots()
+
+hbars = ax.barh(y_pos, performance, align='center', color=color_palette)
+ax.set_yticks(y_pos, labels=people)
+ax.invert_yaxis()  # labels read top-to-bottom
+ax.set_xlabel('Performance')
+ax.set_title('Logistic regression')
+
+# Label with specially formatted floats
+ax.bar_label(hbars, fmt='%.2f')
+ax.set_xlim(right=110)  # adjust xlim to fit labels
+
+plt.show()
+
 
 smote = SMOTE()
 
@@ -55,8 +115,14 @@ X_bal, y_bal = smote.fit_resample(X, y)
 
 
 print("--------- BALANCED -----------")
-logistic_regression(X_bal, y_bal, True)
-
+valori = logistic_regression(X_bal, y_bal, True)
+print("------------------- test ----------------")
+print("precision:")
+print(valori[0])
+print("recall:")
+print(valori[1])
+print("f1:")
+print(valori[2])
 """
     con il dataset bilanciato miglioro l'f1 per tutte le classi 
     al costo di diminuire la classe sana da circa 80% a circa 75%
