@@ -23,6 +23,7 @@ def ANN(dataset):
     model.add(layers.Dense(16, activation='relu'))
     model.add(layers.Dense(8, activation='relu'))
     model.add(layers.Dense(5, activation='softmax'))
+    # continuo a non riuscure a far andare la softmax :(
 
     opt = tf.keras.optimizers.Adam(lr=0.0001)
 
